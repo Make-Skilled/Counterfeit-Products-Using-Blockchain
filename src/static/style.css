@@ -1,0 +1,212 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: url('https://www.the-blockchain.com/wp-content/uploads/2024/12/DALL%C2%B7E-2024-12-03-21.57.48-A-clean-and-modern-graphic-showing-the-concept-of-blockchain-technology-with-interconnected-blocks-representing-a-blockchain-lines-and-nodes-formin-768x439.jpeg') no-repeat center center/cover;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(19, 19, 19, 0.3); 
+    z-index: -1;
+}
+.navbar {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6); 
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(15, 4, 4, 0.5);
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.logo {
+    color: #e2e2e2;
+    font-size: 1.8rem;
+    text-decoration: none;
+    font-weight: bold;
+    text-shadow: 1px 1px 4px rgb(0, 0, 0);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links li {
+    display: inline;
+}
+
+.nav-links a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: 0.3s;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.nav-links a:hover {
+    background-color: #41c2ea;
+    color: #fff;
+}
+.btn-logout, .btn-delete {
+    background: #ff4d4d;
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 0.5rem 0;
+    width: 100%;
+}
+
+.btn-logout:hover, .btn-delete:hover {
+    background: #cc0000;
+}
+
+.btn-cancel {
+    background: #4cc9f0;
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 0.5rem 0;
+    width: 100%;
+}
+
+.btn-cancel:hover {
+    background: #478f9d;
+}
+
+.warning {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.container {
+    margin-top: 80px; 
+    background: rgba(101, 101, 101, 0); 
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 400px;
+    backdrop-filter: blur(5px);
+}
+
+.container {
+    background: rgba(82, 126, 107, 0); 
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 400px;
+    backdrop-filter: blur(5px); 
+}
+.form-box {
+    text-align: center;
+}
+
+h3 {
+    font-size: 2.0rem;
+    margin-bottom: 1rem;
+    color: #d9ded9;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #202b1f;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+p.tagline {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    color: #1d2025;
+}
+
+input {
+    width: 100%;
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+}
+
+button {
+    background: #4cc9f0;
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+
+button:hover {
+    background: #478f9d;
+}
+
+p.switch {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #ffffff;
+}
+
+p.switch a {
+    color: #67d0db;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+p.switch a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+
+
+
+
+
+

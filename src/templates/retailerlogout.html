@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h3>Are you sure you want to log out?</h3>
+            <form action="index.html" method="GET">
+                <button type="submit" class="btn-logout" id="logout-btn">Yes, Log Out</button>
+            </form>
+            <form action="retailerlogin.html" method="GET">
+                <button type="button" class="btn-cancel" id="cancel-logout-btn">Cancel</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const cancelLogoutButton = document.getElementById('cancel-logout-btn');
+        cancelLogoutButton.addEventListener('click', () => {
+            console.log('User canceled logout.');
+            window.location.href = 'retailerlogin.html'; 
+        });
+    </script>
+</body>
+</html>
