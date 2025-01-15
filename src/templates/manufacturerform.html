@@ -93,7 +93,7 @@
     </nav>
     <div class="container">
         <h3>Add Product Details</h3>
-        <form id="productForm">
+        <form id="productForm" action="/addProduct ">
             <label for="product-id">Product ID:</label>
             <input type="text" id="product-id" name="product_id" placeholder="Enter product ID" required>
 
@@ -109,29 +109,7 @@
             <button type="submit">Submit</button>
         </form>
     </div>
-    <script>
-        document.getElementById('productForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const productId = document.getElementById('product-id').value;
-            const productName = document.getElementById('product-name').value;
-            const manufactureDate = document.getElementById('manufacture-date').value;
-            const productImage = document.getElementById('product-image').files[0];
-            const reader = new FileReader();
-            reader.onload = function () {
-                const productDetails = {
-                    productId,
-                    productName,
-                    manufactureDate,
-                    productImage: reader.result 
-                };
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                products.push(productDetails); 
-                localStorage.setItem('products', JSON.stringify(products)); 
-                window.location.href = 'productdetails.html';
-            };
-            reader.readAsDataURL(productImage);
-        });
-    </script>
+    
     
 
 </body>

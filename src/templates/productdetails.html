@@ -139,36 +139,6 @@
         <div class="product-list" id="product-list"></div>
         <button class="go-back-btn" onclick="goBack()">Go Back</button>
     </div>
-    <script>
-        const products = JSON.parse(localStorage.getItem('products')) || [];
-        if (products.length === 0) {
-            alert('No product details found!');
-            window.location.href = 'manufacturerform.html';
-        } else {
-            const productList = document.getElementById('product-list');
-            products.forEach((product, index) => {
-                const productCard = document.createElement('div');
-                productCard.classList.add('product-card');
-                productCard.innerHTML = `
-                    <h4>${product.productName}</h4>
-                    <p><strong>Product ID:</strong> ${product.productId}</p>
-                    <p><strong>Manufacture Date:</strong> ${product.manufactureDate}</p>
-                    <img src="${product.productImage}" alt="Product Image">
-                    <button class="remove-btn" onclick="removeProduct(${index})">Remove</button>
-                `;
-                productList.appendChild(productCard);
-            });
-        }
-        function removeProduct(index) {
-            const products = JSON.parse(localStorage.getItem('products')) || [];
-            products.splice(index, 1);
-            localStorage.setItem('products', JSON.stringify(products));
-            window.location.reload();
-        }
-
-        function goBack() {
-            window.location.href = 'manufacturerform.html';
-        }
-    </script>
+    
 </body>
 </html>

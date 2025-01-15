@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manufacturer Signup</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../static/style.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,27 +58,9 @@
             <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
             <button type="submit">Sign Up</button>
         </form>
-        <p class="switch">Already have an account? <a href="manufacturerlogin.html">Login here</a></p>
+        <p class="switch">Already have an account? <a href="/manufacturerlogin">Login here</a></p>
         <p style="color:red ;">{{message}}</p>
     </div>
-    <script>
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-            const user = { email, password };
-            localStorage.setItem('user', JSON.stringify(user));
-
-            alert('Signup successful! Redirecting to login page.');
-            window.location.href = 'manufacturerlogin.html';
-        });
-    </script>
+    
 </body>
 </html>
