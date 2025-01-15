@@ -96,7 +96,25 @@ def register():
     
 @app.route('/manufacturerDashboard')
 def manufacturerDashboard():
+    if 'userwallet' not in session or session['userrole'] != 'consumer':
+       return redirect('/manufacturerlogin')
     return render_template("manufacturerHome.html")
+
+@app.route('/consumerDashboard')
+def consumer_dashboard():
+    # Ensure the user is logged in as a Consumer
+    if 'userwallet' not in session or session['userrole'] != 'consumer':
+        return redirect('/consumerlogin')  # Redirect to the login page if not authenticated
+    return render_template('consumerHome.html')  # Replace with your consumer dashboard HTML page
+
+
+@app.route('/retailerDashboard')
+def retailer_dashboard():
+    # Ensure the user is logged in as a Retailer
+    if 'userwallet' not in session or session['userrole'] != 'retailer':
+        return redirect('/retaailerlogin')  # Redirect to the login page if not authenticated
+    return render_template('retailerHome.html')  # Replace with your retailer dashboard HTML page
+
 
 @app.route('/login', methods=['POST'])
 def login():
