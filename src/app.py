@@ -145,14 +145,32 @@ def get_product_details():
 
         # Prepare the product details
         product_details = {
-            'manufacturer': details[0],
+            'manufacturer': details[0],  # Manufacturer address
             'productId': details[1],
             'productName': details[2],
             'manufactureDate': details[3],
             'filePath': details[5]
         }
 
-        return jsonify({'product': product_details}), 200
+        # Fetch manufacturer details using the manufacturer address
+        manufacturer_address = details[0]  # Manufacturer's wallet address
+
+        # Connect to the UserManagement contract
+        user_contract, user_web3 = connectWithContract(
+            manufacturer_address, artifact="../build/contracts/userManagement.json"
+        )
+
+        # Fetch manufacturer details
+        manufacturer_details = user_contract.functions.viewUserByWallet(manufacturer_address).call()
+
+        manufacturer_data = {
+            'manufacturerName': manufacturer_details[1],  # Manufacturer's name
+            'manufacturerEmail': manufacturer_details[4],  # Manufacturer's email
+            'manufacturerRole': manufacturer_details[3]  # Manufacturer's role
+        }
+
+        # Return product details along with manufacturer details
+        return jsonify({'product': product_details, 'manufacturer': manufacturer_data}), 200
 
     except Exception as e:
         print(f"Error fetching product details: {e}")

@@ -112,58 +112,64 @@
         </div>
 
         <!-- Product Details Section -->
-        <div id="productDetails">
-            <h2>Product Details</h2>
-            <div class="product-info">
-                <div>
-                    <p><strong>Manufacturer:</strong> <span id="manufacturer"></span></p>
-                    <p><strong>Product ID:</strong> <span id="productId"></span></p>
-                    <p><strong>Product Name:</strong> <span id="productName"></span></p>
-                    <p><strong>Manufacture Date:</strong> <span id="manufactureDate"></span></p>
-                    <p><strong>File Path:</strong> <span id="filePath"></span></p>
-                </div>
-                <div>
-                    <img id="productImage" src="" alt="Product Image" style="display: none;">
-                </div>
-            </div>
+        <!-- Product Details -->
+<div id="productDetails" style="display: none;">
+    <h2>Product Details</h2>
+    <div class="product-info">
+        <div>
+            <p><strong>Manufacturer:</strong> <span id="manufacturerName"></span></p>
+            <p><strong>Manufacturer Email:</strong> <span id="manufacturerEmail"></span></p>
+            <p><strong>Product ID:</strong> <span id="productId"></span></p>
+            <p><strong>Product Name:</strong> <span id="productName"></span></p>
+            <p><strong>Manufacture Date:</strong> <span id="manufactureDate"></span></p>
+            <p><strong>Product Hash:</strong> <span id="productHash"></span></p>
+            <p><strong>File Path:</strong> <span id="filePath"></span></p>
+        </div>
+        <div>
+            <img id="productImage" src="" alt="Product Image" style="display: none;">
         </div>
     </div>
+</div>
 
-    <script>
-        function searchProduct() {
-            var productHash = document.getElementById("productHash").value;
+<script>
+    function searchProduct() {
+        var productHash = document.getElementById("productHash").value;
 
-            if (!productHash) {
-                alert("Please enter a product hash!");
-                return;
-            }
-
-            $.get("/getProductDetails", { hash: productHash }, function(response) {
-                if (response.product) {
-                    document.getElementById("productDetails").style.display = "block";
-                    document.getElementById("manufacturer").innerText = response.product.manufacturer;
-                    document.getElementById("productId").innerText = response.product.productId;
-                    document.getElementById("productName").innerText = response.product.productName;
-                    document.getElementById("manufactureDate").innerText = response.product.manufactureDate;
-                    document.getElementById("filePath").innerText = response.product.filePath;
-
-                    // Display the image if filePath is provided
-                    var productImage = document.getElementById("productImage");
-                    if (response.product.filePath) {
-                        productImage.style.display = "block";
-                        productImage.src = response.product.filePath; // Update the image source
-                    } else {
-                        productImage.style.display = "none";
-                    }
-
-                } else {
-                    alert("Product not found!");
-                    document.getElementById("productDetails").style.display = "none"; // Hide the product details section
-                }
-            }).fail(function() {
-                alert("Error fetching product details. Please try again later.");
-            });
+        if (!productHash) {
+            alert("Please enter a product hash!");
+            return;
         }
-    </script>
+
+        $.get("/getProductDetails", { hash: productHash }, function(response) {
+            if (response.product) {
+                document.getElementById("productDetails").style.display = "block";
+
+                // Populate product details
+                document.getElementById("manufacturerName").innerText = response.manufacturer.manufacturerName;
+                document.getElementById("manufacturerEmail").innerText = response.manufacturer.manufacturerEmail;
+                document.getElementById("productId").innerText = response.product.productId;
+                document.getElementById("productName").innerText = response.product.productName;
+                document.getElementById("manufactureDate").innerText = response.product.manufactureDate;
+                document.getElementById("productHash").innerText = response.product.productHash;
+                document.getElementById("filePath").innerText = response.product.filePath;
+
+                // Display the product image if file path is provided
+                var productImage = document.getElementById("productImage");
+                if (response.product.filePath) {
+                    productImage.style.display = "block";
+                    productImage.src = response.product.filePath; // Update the image source
+                } else {
+                    productImage.style.display = "none";
+                }
+            } else {
+                alert("Product not found!");
+                document.getElementById("productDetails").style.display = "none";
+            }
+        }).fail(function() {
+            alert("Error fetching product details. Please try again later.");
+        });
+    }
+</script>
+
 </body>
 </html>
