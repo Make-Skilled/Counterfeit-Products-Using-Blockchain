@@ -93,7 +93,7 @@
     </nav>
     <div class="container">
         <h3>Add Product Details</h3>
-        <form id="productForm" action="/addProduct" method="post" enctype="multipart/form-data">
+        <form id="productForm" action="/addingProduct" method="post" enctype="multipart/form-data">
             <label for="product-id">Product ID:</label>
             <input type="text" id="product-id" name="product_id" placeholder="Enter product ID" required>
         
@@ -106,12 +106,29 @@
             <label for="product-image">Product Image:</label>
             <input type="file" id="product-image" name="product_image" accept="image/*" required>
         
+            <label for="retailer">Select Retailer:</label>
+            <select id="retailer" name="retailer" required>
+                <option value="">-- Select Retailer --</option>
+            </select>
+        
             <button type="submit">Submit</button>
         </form>
         
-    </div>
-    
-    
-
+        <script>
+            // Fetch and populate retailer list
+            fetch('/getRetailers')
+                .then(response => response.json())
+                .then(data => {
+                    const retailerSelect = document.getElementById('retailer');
+                    data.retailers.forEach(retailer => {
+                        const option = document.createElement('option');
+                        option.value = retailer.wallet;
+                        option.textContent = `${retailer.name} (${retailer.wallet})`;
+                        retailerSelect.appendChild(option);
+                    });
+                })
+                .catch(err => console.error('Error fetching retailers:', err));
+        </script>
+        
 </body>
 </html>

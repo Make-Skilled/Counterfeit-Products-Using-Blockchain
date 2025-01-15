@@ -119,7 +119,7 @@ def retailer_dashboard():
 @app.route('/getProductDetails', methods=['GET'])
 def get_product_details():
     # Ensure the user is logged in as a Retailer
-    if 'userwallet' not in session or session['userrole'] != 'retailer':
+    if 'userwallet' not in session or session['userrole'] != 'consumer':
         return jsonify({'message': 'Unauthorized access. Please log in as a Retailer.'}), 401
 
     # Get the product hash from the query parameters
@@ -222,8 +222,31 @@ def login():
     except Exception as e:
         print(f"Error during login: {e}")
         return render_template('index.html', message='Error logging in. Please try again later.')
+    
 
-@app.route('/addProduct', methods=['POST'])
+@app.route('/getRetailers', methods=['GET'])
+def get_retailers():
+    try:
+        # Connect to the UserManagement contract
+        contract, web3 = connectWithContract(0)  # Use default wallet for contract connection
+
+        # Fetch all users
+        users = contract.functions.viewAllUsers().call()
+
+        # Filter users with the role "retailer"
+        retailers = [
+            {'wallet': user[0], 'name': user[1], 'email': user[4]}
+            for user in users if user[3] == "retailer"
+        ]
+
+        return jsonify({'retailers': retailers}), 200
+
+    except Exception as e:
+        print(f"Error fetching retailers: {e}")
+        return jsonify({'message': 'Error fetching retailers. Please try again later.'}), 500
+
+
+@app.route('/addingProduct', methods=['POST'])
 def add_product():
     # Check if the manufacturer is logged in
     if 'userwallet' not in session or session['userrole'] != 'Manufacturer':
@@ -233,6 +256,7 @@ def add_product():
     product_id = request.form['product_id']
     product_name = request.form['product_name']
     manufacture_date = request.form['manufacture_date']
+    retailer_address = request.form['retailer']  # Get selected retailer address
     product_file = request.files['product_image']
 
     # Ensure 'static/uploads' directory exists
@@ -244,19 +268,27 @@ def add_product():
     file_path = os.path.join(upload_dir, filename)
     product_file.save(file_path)
 
+    # Connect to the ProductManagement contract
+    try:
+        contract, web3 = connectWithContract(
+            session['userwallet'], artifact="../build/contracts/ProductManagement.json"
+        )
+    except Exception as e:
+        print(f"Error connecting to contract: {e}")
+        return jsonify({'message': 'Error connecting to contract.'}), 500
+
+    # Validate retailer address
+    if not web3.isAddress(retailer_address):
+        return jsonify({'message': 'Invalid retailer address.'}), 400
+
     # Generate a unique hash for the product
     product_hash = hashlib.sha256((product_id + product_name + manufacture_date).encode()).hexdigest()
-
-    # Connect to the ProductManagement contract
-    contract, web3 = connectWithContract(
-        session['userwallet'], artifact="../build/contracts/ProductManagement.json"
-    )
 
     try:
         # Add product to the blockchain
         tx_hash = contract.functions.addProduct(
-            session['userwallet'], product_id, product_name, manufacture_date, product_hash, file_path
-        ).transact()
+            product_id, product_name, manufacture_date, product_hash, file_path, retailer_address
+        ).transact({'from': session['userwallet']})
         web3.eth.waitForTransactionReceipt(tx_hash)
 
         # Success response
@@ -267,14 +299,12 @@ def add_product():
         return jsonify({'message': 'Error adding product. Please try again later.'}), 500
 
 
-
 @app.route('/manufacturerProducts')
 def manufacturer_products_page():
     # Ensure the user is logged in as a Manufacturer
     if 'userwallet' not in session or session['userrole'] != 'Manufacturer':
         return redirect('/manufacturerlogin')  # Redirect to the login page if not authenticated
     return render_template('productdetails.html')
-
 
 @app.route('/getManufacturerProducts', methods=['GET'])
 def get_manufacturer_products():
@@ -296,13 +326,34 @@ def get_manufacturer_products():
         # Fetch details for each product ID
         for product_id in product_ids:
             details = contract.functions.getProductDetails(product_id).call()
+
+            # Log the product details to see the returned data structure
+            print(f"Product details for product ID {product_id}: {details}")
+
+            # Extract retailer address from product details
+            retailer_address = details[1]  # Retailer address is at index 1 in the returned details
+
+            # Fetch retailer details using the retailer address
+            user_contract, user_web3 = connectWithContract(
+                retailer_address, artifact="../build/contracts/userManagement.json"
+            )
+            retailer_details = user_contract.functions.viewUserByWallet(retailer_address).call()
+
+            # Log retailer details to verify the data
+            print(f"Retailer details for address {retailer_address}: {retailer_details}")
+
+            # Prepare product details along with retailer's name and email
             products.append({
-                'manufacturer': details[0],
-                'productId': details[1],
-                'productName': details[2],
-                'manufactureDate': details[3],
-                'productHash': details[4],  # Updated to include productHash
-                'filePath': details[5]      # Updated to include filePath
+                'manufacturer': details[0],     # Manufacturer address
+                'retailer': {
+                    'name': retailer_details[1],         # Retailer name
+                    'email': retailer_details[4]        # Retailer email
+                },
+                'productId': details[2],        # Product ID
+                'productName': details[3],      # Product name
+                'manufactureDate': details[4],  # Manufacture date
+                'productHash': details[5],      # Product hash
+                'filePath': details[6]          # File path (image URL or document)
             })
 
         print(f"Fetched products: {products}")
