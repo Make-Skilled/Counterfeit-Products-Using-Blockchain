@@ -13,6 +13,7 @@ contract ProductManagement {
 
     mapping(string => Product) public products; // Mapping product ID to Product details
     mapping(address => string[]) public manufacturerProducts; // Manufacturer to list of product IDs
+    mapping(string => string) public productHashToId; // Map productHash to productId
 
     event ProductAdded(address indexed manufacturer, string productId, string productHash);
 
@@ -42,6 +43,9 @@ contract ProductManagement {
             productHash: productHash,
             filePath: filePath
         });
+
+        // Map product hash to product ID
+        productHashToId[productHash] = productId;
 
         // Link product ID to the manufacturer
         manufacturerProducts[manufacturer].push(productId);
@@ -77,5 +81,12 @@ contract ProductManagement {
             product.productHash,
             product.filePath
         );
+    }
+
+    /// @notice Get the product ID by its hash.
+    /// @param productHash The unique hash representing the product.
+    /// @return The product ID associated with the hash.
+    function getProductIdByHash(string memory productHash) public view returns (string memory) {
+        return productHashToId[productHash];
     }
 }

@@ -32,21 +32,5 @@
             </form>
         </div>
     </div>
-    <script>
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
-            }
-            const user = { email, password };
-            localStorage.setItem('user', JSON.stringify(user));
-            alert('Signup successful! Redirecting to login page.');
-            window.location.href = 'retailerlogin.html';
-        });
-    </script>
 </body>
 </html>

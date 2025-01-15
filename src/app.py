@@ -92,11 +92,11 @@ def register():
         elif role == "retailer":
             return render_template("retailersignup.html", message='Signup Successful')
     except:
-        return render_template('signup.html', message='There was a problem creating the account.')
+        return render_template('index.html', message='There was a problem creating the account.')
     
 @app.route('/manufacturerDashboard')
 def manufacturerDashboard():
-    if 'userwallet' not in session or session['userrole'] != 'consumer':
+    if 'userwallet' not in session or session['userrole'] != 'Manufacturer':
        return redirect('/manufacturerlogin')
     return render_template("manufacturerHome.html")
 
@@ -114,6 +114,50 @@ def retailer_dashboard():
     if 'userwallet' not in session or session['userrole'] != 'retailer':
         return redirect('/retaailerlogin')  # Redirect to the login page if not authenticated
     return render_template('retailerHome.html')  # Replace with your retailer dashboard HTML page
+
+
+@app.route('/getProductDetails', methods=['GET'])
+def get_product_details():
+    # Ensure the user is logged in as a Retailer
+    if 'userwallet' not in session or session['userrole'] != 'retailer':
+        return jsonify({'message': 'Unauthorized access. Please log in as a Retailer.'}), 401
+
+    # Get the product hash from the query parameters
+    product_hash = request.args.get('hash')
+
+    if not product_hash:
+        return jsonify({'message': 'No product hash provided.'}), 400
+
+    try:
+        # Connect to the ProductManagement contract
+        contract, web3 = connectWithContract(
+            session['userwallet'], artifact="../build/contracts/ProductManagement.json"
+        )
+
+        # Get the product ID by product hash
+        product_id = contract.functions.getProductIdByHash(product_hash).call()
+
+        if not product_id:
+            return jsonify({'message': 'Product not found.'}), 404
+
+        # Fetch product details by product ID
+        details = contract.functions.getProductDetails(product_id).call()
+
+        # Prepare the product details
+        product_details = {
+            'manufacturer': details[0],
+            'productId': details[1],
+            'productName': details[2],
+            'manufactureDate': details[3],
+            'filePath': details[5]
+        }
+
+        return jsonify({'product': product_details}), 200
+
+    except Exception as e:
+        print(f"Error fetching product details: {e}")
+        return jsonify({'message': 'Error fetching product details. Please try again later.'}), 500
+
 
 
 @app.route('/login', methods=['POST'])
@@ -149,6 +193,7 @@ def login():
             elif session['userrole'] == 'retailer':
                 return redirect('/retailerDashboard')  # Retailer-specific dashboard
             elif session['userrole'] == 'Manufacturer':
+                print("manufacturer")
                 return redirect('/manufacturerDashboard')  # Manufacturer-specific dashboard
             else:
                 return render_template('index.html', message='Role not recognized. Contact support.')
