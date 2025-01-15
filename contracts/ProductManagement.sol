@@ -3,24 +3,33 @@ pragma solidity ^0.8.0;
 
 contract ProductManagement {
     struct Product {
-        address manufacturer;
-        string productId;
-        string productName;
-        string manufactureDate;
-        string imageHash;
+        address manufacturer;    // Address of the product manufacturer
+        string productId;        // Unique identifier for the product
+        string productName;      // Name of the product
+        string manufactureDate;  // Date of manufacture
+        string productHash;      // Hash value uniquely identifying the product
+        string filePath;         // Optional file path related to the product (e.g., additional data or docs)
     }
 
     mapping(string => Product) public products; // Mapping product ID to Product details
     mapping(address => string[]) public manufacturerProducts; // Manufacturer to list of product IDs
 
-    event ProductAdded(address indexed manufacturer, string productId);
+    event ProductAdded(address indexed manufacturer, string productId, string productHash);
 
+    /// @notice Add a new product to the contract.
+    /// @param manufacturer The address of the manufacturer.
+    /// @param productId A unique identifier for the product.
+    /// @param productName The name of the product.
+    /// @param manufactureDate The manufacture date of the product.
+    /// @param productHash A unique hash representing the product.
+    /// @param filePath An optional file path related to the product.
     function addProduct(
         address manufacturer,
         string memory productId,
         string memory productName,
         string memory manufactureDate,
-        string memory imageHash
+        string memory productHash,
+        string memory filePath
     ) public {
         require(bytes(products[productId].productId).length == 0, "Product ID already exists.");
 
@@ -30,21 +39,33 @@ contract ProductManagement {
             productId: productId,
             productName: productName,
             manufactureDate: manufactureDate,
-            imageHash: imageHash
+            productHash: productHash,
+            filePath: filePath
         });
 
         // Link product ID to the manufacturer
         manufacturerProducts[manufacturer].push(productId);
 
-        emit ProductAdded(manufacturer, productId);
+        emit ProductAdded(manufacturer, productId, productHash);
     }
 
+    /// @notice Get a list of products added by a manufacturer.
+    /// @param manufacturer The address of the manufacturer.
+    /// @return An array of product IDs.
     function getProductsByManufacturer(address manufacturer) public view returns (string[] memory) {
         return manufacturerProducts[manufacturer];
     }
 
+    /// @notice Get the details of a product by its ID.
+    /// @param productId The unique identifier of the product.
+    /// @return The details of the product (manufacturer, productId, productName, manufactureDate, productHash, filePath).
     function getProductDetails(string memory productId) public view returns (
-        address, string memory, string memory, string memory, string memory
+        address,
+        string memory,
+        string memory,
+        string memory,
+        string memory,
+        string memory
     ) {
         Product memory product = products[productId];
         require(bytes(product.productId).length != 0, "Product does not exist.");
@@ -53,7 +74,8 @@ contract ProductManagement {
             product.productId,
             product.productName,
             product.manufactureDate,
-            product.imageHash
+            product.productHash,
+            product.filePath
         );
     }
 }

@@ -152,20 +152,19 @@ def add_product():
     product_id = request.form['product_id']
     product_name = request.form['product_name']
     manufacture_date = request.form['manufacture_date']
-    product_image = request.files['product_image']
+    product_file = request.files['product_image']
 
     # Ensure 'static/uploads' directory exists
     upload_dir = os.path.join('static', 'uploads')
     os.makedirs(upload_dir, exist_ok=True)
 
-    # Securely save the image temporarily
-    filename = secure_filename(product_image.filename)
-    image_path = os.path.join(upload_dir, filename)
-    product_image.save(image_path)
+    # Securely save the uploaded file
+    filename = secure_filename(product_file.filename)
+    file_path = os.path.join(upload_dir, filename)
+    product_file.save(file_path)
 
-    # Generate a hash of the product image for uniqueness verification
-    with open(image_path, 'rb') as img_file:
-        image_hash = hashlib.sha256(img_file.read()).hexdigest()
+    # Generate a unique hash for the product
+    product_hash = hashlib.sha256((product_id + product_name + manufacture_date).encode()).hexdigest()
 
     # Connect to the ProductManagement contract
     contract, web3 = connectWithContract(
@@ -175,7 +174,7 @@ def add_product():
     try:
         # Add product to the blockchain
         tx_hash = contract.functions.addProduct(
-            session['userwallet'], product_id, product_name, manufacture_date, image_hash
+            session['userwallet'], product_id, product_name, manufacture_date, product_hash, file_path
         ).transact()
         web3.eth.waitForTransactionReceipt(tx_hash)
 
@@ -186,6 +185,51 @@ def add_product():
         print(f"Error adding product: {e}")
         return jsonify({'message': 'Error adding product. Please try again later.'}), 500
 
+
+
+@app.route('/manufacturerProducts')
+def manufacturer_products_page():
+    # Ensure the user is logged in as a Manufacturer
+    if 'userwallet' not in session or session['userrole'] != 'Manufacturer':
+        return redirect('/manufacturerlogin')  # Redirect to the login page if not authenticated
+    return render_template('productdetails.html')
+
+
+@app.route('/getManufacturerProducts', methods=['GET'])
+def get_manufacturer_products():
+    if 'userwallet' not in session or session['userrole'] != 'Manufacturer':
+        return jsonify({'message': 'Unauthorized access. Please log in as a Manufacturer.'}), 401
+
+    try:
+        # Connect to the ProductManagement contract
+        contract, web3 = connectWithContract(
+            session['userwallet'], artifact="../build/contracts/ProductManagement.json"
+        )
+
+        # Fetch the product IDs associated with the logged-in manufacturer
+        product_ids = contract.functions.getProductsByManufacturer(session['userwallet']).call()
+
+        # Initialize a list to store product details
+        products = []
+
+        # Fetch details for each product ID
+        for product_id in product_ids:
+            details = contract.functions.getProductDetails(product_id).call()
+            products.append({
+                'manufacturer': details[0],
+                'productId': details[1],
+                'productName': details[2],
+                'manufactureDate': details[3],
+                'productHash': details[4],  # Updated to include productHash
+                'filePath': details[5]      # Updated to include filePath
+            })
+
+        print(f"Fetched products: {products}")
+        return jsonify({'products': products}), 200
+
+    except Exception as e:
+        print(f"Error fetching products: {e}")
+        return jsonify({'message': 'Error fetching products. Please try again later.'}), 500
 
 
 if __name__ == "__main__":
