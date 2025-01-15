@@ -93,21 +93,22 @@
     </nav>
     <div class="container">
         <h3>Add Product Details</h3>
-        <form id="productForm" action="/addProduct" method="post">
+        <form id="productForm" action="/addProduct" method="post" enctype="multipart/form-data">
             <label for="product-id">Product ID:</label>
             <input type="text" id="product-id" name="product_id" placeholder="Enter product ID" required>
-
+        
             <label for="product-name">Product Name:</label>
             <input type="text" id="product-name" name="product_name" placeholder="Enter product name" required>
-
+        
             <label for="manufacture-date">Manufacture Date:</label>
             <input type="date" id="manufacture-date" name="manufacture_date" required>
-
+        
             <label for="product-image">Product Image:</label>
             <input type="file" id="product-image" name="product_image" accept="image/*" required>
-
+        
             <button type="submit">Submit</button>
         </form>
+        
     </div>
     
     

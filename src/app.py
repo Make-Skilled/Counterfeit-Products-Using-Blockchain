@@ -154,17 +154,23 @@ def add_product():
     manufacture_date = request.form['manufacture_date']
     product_image = request.files['product_image']
 
+    # Ensure 'static/uploads' directory exists
+    upload_dir = os.path.join('static', 'uploads')
+    os.makedirs(upload_dir, exist_ok=True)
+
     # Securely save the image temporarily
     filename = secure_filename(product_image.filename)
-    image_path = os.path.join('static/uploads', filename)
+    image_path = os.path.join(upload_dir, filename)
     product_image.save(image_path)
 
     # Generate a hash of the product image for uniqueness verification
     with open(image_path, 'rb') as img_file:
         image_hash = hashlib.sha256(img_file.read()).hexdigest()
 
-    # Connect to the Product contract
-    contract, web3 = connectWithContract(session['userwallet'], artifact="../build/contracts/productManagement.json")
+    # Connect to the ProductManagement contract
+    contract, web3 = connectWithContract(
+        session['userwallet'], artifact="../build/contracts/ProductManagement.json"
+    )
 
     try:
         # Add product to the blockchain
@@ -172,6 +178,8 @@ def add_product():
             session['userwallet'], product_id, product_name, manufacture_date, image_hash
         ).transact()
         web3.eth.waitForTransactionReceipt(tx_hash)
+
+        # Success response
         return jsonify({'message': 'Product added successfully.'}), 200
 
     except Exception as e:
