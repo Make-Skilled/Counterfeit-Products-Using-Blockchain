@@ -363,6 +363,12 @@ def get_manufacturer_products():
         print(f"Error fetching products: {e}")
         return jsonify({'message': 'Error fetching products. Please try again later.'}), 500
 
+@app.route('/logout')
+def logout():
+    session.clear()  # Clear all session data
+    return redirect('/')  # Redirect to the homepage
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=7000, debug=True)
