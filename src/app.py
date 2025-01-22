@@ -363,6 +363,62 @@ def get_manufacturer_products():
         print(f"Error fetching products: {e}")
         return jsonify({'message': 'Error fetching products. Please try again later.'}), 500
 
+
+@app.route('/getRetailerProducts', methods=['GET'])
+def get_retailer_products():
+    if 'userwallet' not in session or session['userrole'] != 'retailer':
+        return jsonify({'message': 'Unauthorized access. Please log in as a Retailer.'}), 401
+
+    try:
+        # Connect to the ProductManagement contract
+        contract, web3 = connectWithContract(
+            session['userwallet'], artifact="../build/contracts/ProductManagement.json"
+        )
+
+        # Get all products from all manufacturers
+        manufacturer_addresses = set()  # Use a set to store unique manufacturer addresses
+        products = []
+
+        # Get all users to find manufacturers
+        user_contract, _ = connectWithContract(0)
+        all_users = user_contract.functions.viewAllUsers().call()
+        
+        # Filter manufacturers
+        for user in all_users:
+            if user[3] == "Manufacturer":  # Check if user role is Manufacturer
+                manufacturer_addresses.add(user[0])  # Add manufacturer address to set
+
+        # For each manufacturer, get their products and filter for the current retailer
+        for manufacturer in manufacturer_addresses:
+            product_ids = contract.functions.getProductsByManufacturer(manufacturer).call()
+            
+            for product_id in product_ids:
+                details = contract.functions.getProductDetails(product_id).call()
+                # Check if the current retailer is assigned to this product
+                if details[1].lower() == session['userwallet'].lower():  # Compare retailer addresses
+                    # Get manufacturer details
+                    manufacturer_details = user_contract.functions.viewUserByWallet(details[0]).call()
+                    
+                    products.append({
+                        'manufacturer': {
+                            'address': details[0],
+                            'name': manufacturer_details[1],
+                            'email': manufacturer_details[4]
+                        },
+                        'productId': details[2],
+                        'productName': details[3],
+                        'manufactureDate': details[4],
+                        'productHash': details[5],
+                        'filePath': details[6]
+                    })
+
+        return jsonify({'products': products}), 200
+
+    except Exception as e:
+        print(f"Error fetching retailer products: {e}")
+        return jsonify({'message': 'Error fetching products. Please try again later.'}), 500
+
+
 @app.route('/logout')
 def logout():
     session.clear()  # Clear all session data

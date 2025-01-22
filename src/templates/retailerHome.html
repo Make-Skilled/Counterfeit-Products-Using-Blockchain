@@ -4,188 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retailer Dashboard</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-            color: #212529;
-        }
-
-        h1 {
-            text-align: center;
-            margin-top: 20px;
-            color: #007bff;
-        }
-
-        .logout-button {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            padding: 10px 15px;
-            font-size: 16px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .logout-button:hover {
-            background-color: #c82333;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .search-bar input {
-            width: 70%;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ced4da;
-        }
-
-        .search-bar button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .search-bar button:hover {
-            background-color: #0056b3;
-        }
-
-        #productDetails {
-            display: none;
-            margin-top: 20px;
-        }
-
-        #productDetails h2 {
-            color: #007bff;
-            text-align: center;
-        }
-
-        .product-info {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .product-info div {
-            margin: 10px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            flex: 1;
-            min-width: 200px;
-            border: 1px solid #ced4da;
-        }
-
-        .product-info div p {
-            margin: 5px 0;
-            font-size: 16px;
-        }
-
-        .product-info img {
-            max-width: 250px;
-            max-height: 250px;
-            border-radius: 8px;
-            object-fit: cover;
-            margin-top: 10px;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <button class="logout-button" onclick="logoutUser()">Logout</button>
-    
-    <h1>Welcome, Consumer!</h1>
-
-    <div class="container">
-        <div class="search-bar">
-            <label for="productHash">Enter Product Hash:</label>
-            <input type="text" id="productHash" name="productHash" placeholder="Enter product hash here">
-            <button onclick="searchProduct()">Search</button>
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-white text-2xl font-bold">Retailer Dashboard</h1>
+            <a href="/logout" class="text-white hover:text-gray-200">Logout</a>
         </div>
+    </nav>
 
-        <div id="productDetails" style="display: none;">
-            <h2>Product Details</h2>
-            <div class="product-info">
-                <div>
-                    <p><strong>Manufacturer Name:</strong> <span id="manufacturerName"></span></p>
-                    <p><strong>Manufacturer Email:</strong> <span id="manufacturerEmail"></span></p>
-                    <p><strong>Product ID:</strong> <span id="productId"></span></p>
-                    <p><strong>Product Name:</strong> <span id="productName"></span></p>
-                    <p><strong>Manufacture Date:</strong> <span id="manufactureDate"></span></p>
-                </div>
-                <div>
-                    <img id="productImage" src="" alt="Product Image" style="display: none;">
-                </div>
+    <div class="container mx-auto p-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">My Products</h2>
+            <div id="productsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Products will be loaded here -->
             </div>
         </div>
     </div>
 
     <script>
-        function searchProduct() {
-            var productHash = document.getElementById("productHash").value;
+        // Fetch and display products when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchRetailerProducts();
+        });
 
-            if (!productHash) {
-                alert("Please enter a product hash!");
+        function fetchRetailerProducts() {
+            fetch('/getRetailerProducts')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.products) {
+                        displayProducts(data.products);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error fetching products. Please try again later.');
+                });
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+
+            if (products.length === 0) {
+                container.innerHTML = '<p class="col-span-full text-center text-gray-500">No products assigned yet.</p>';
                 return;
             }
 
-            $.get("/getProductDetails", { hash: productHash }, function(response) {
-                if (response.product) {
-                    document.getElementById("productDetails").style.display = "block";
-
-                    // Populate product details
-                    document.getElementById("manufacturerName").innerText = response.manufacturer.manufacturerName;
-                    document.getElementById("manufacturerEmail").innerText = response.manufacturer.manufacturerEmail;
-                    document.getElementById("productId").innerText = response.product.productId;
-                    document.getElementById("productName").innerText = response.product.productName;
-                    document.getElementById("manufactureDate").innerText = response.product.manufactureDate;
-                    document.getElementById("productHashDisplay").innerText = response.product.productHash;
-                    document.getElementById("filePath").innerText = response.product.filePath;
-
-                    // Display the product image if file path is provided
-                    var productImage = document.getElementById("productImage");
-                    if (response.product.filePath) {
-                        productImage.style.display = "block";
-                        productImage.src = response.product.filePath; // Update the image source
-                    } else {
-                        productImage.style.display = "none";
-                    }
-                } else {
-                    alert("Product not found!");
-                    document.getElementById("productDetails").style.display = "none";
-                }
-            }).fail(function() {
-                alert("Error fetching product details. Please try again later.");
+            products.forEach(product => {
+                const productCard = `
+                    <div class="bg-gray-50 rounded-lg p-4 shadow">
+                        <div class="mb-4">
+                            ${product.filePath ? 
+                                `<img src="${product.filePath}" alt="${product.productName}" class="w-full h-48 object-cover rounded">` :
+                                `<div class="w-full h-48 bg-gray-200 rounded flex items-center justify-center">No Image</div>`
+                            }
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2">${product.productName}</h3>
+                        <div class="text-sm text-gray-600">
+                            <p><strong>Product ID:</strong> ${product.productId}</p>
+                            <p><strong>Manufacture Date:</strong> ${product.manufactureDate}</p>
+                            <p><strong>Manufacturer:</strong> ${product.manufacturer.name}</p>
+                            <p><strong>Manufacturer Email:</strong> ${product.manufacturer.email}</p>
+                            <p class="mt-2"><strong>Product Hash:</strong> 
+                                <span class="text-xs break-all">${product.productHash}</span>
+                            </p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += productCard;
             });
-        }
-
-        function logoutUser() {
-            // Redirect to login page or handle logout
-            window.location.href = "/logout"; // Adjust the logout URL as per backend implementation
         }
     </script>
 </body>
