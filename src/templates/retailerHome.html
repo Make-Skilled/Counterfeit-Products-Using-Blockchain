@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consumer Dashboard</title>
+    <title>Retailer Dashboard</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
@@ -15,29 +15,23 @@
             color: #212529;
         }
 
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #007bff;
-            padding: 15px;
-            color: white;
-        }
-
-        .navbar h1 {
-            margin: 0;
-            font-size: 24px;
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #007bff;
         }
 
         .logout-button {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 16px;
             background-color: #dc3545;
             color: white;
             border: none;
-            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
-            text-decoration: none;
-            font-size: 16px;
         }
 
         .logout-button:hover {
@@ -122,10 +116,9 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <h1>Welcome, Consumer!</h1>
-        <a href="/logout" class="logout-button">Logout</a>
-    </div>
+    <button class="logout-button" onclick="logoutUser()">Logout</button>
+    
+    <h1>Welcome, Consumer!</h1>
 
     <div class="container">
         <div class="search-bar">
@@ -143,7 +136,6 @@
                     <p><strong>Product ID:</strong> <span id="productId"></span></p>
                     <p><strong>Product Name:</strong> <span id="productName"></span></p>
                     <p><strong>Manufacture Date:</strong> <span id="manufactureDate"></span></p>
-                    
                 </div>
                 <div>
                     <img id="productImage" src="" alt="Product Image" style="display: none;">
@@ -178,7 +170,7 @@
                     var productImage = document.getElementById("productImage");
                     if (response.product.filePath) {
                         productImage.style.display = "block";
-                        productImage.src = response.product.filePath;
+                        productImage.src = response.product.filePath; // Update the image source
                     } else {
                         productImage.style.display = "none";
                     }
@@ -189,6 +181,11 @@
             }).fail(function() {
                 alert("Error fetching product details. Please try again later.");
             });
+        }
+
+        function logoutUser() {
+            // Redirect to login page or handle logout
+            window.location.href = "/logout"; // Adjust the logout URL as per backend implementation
         }
     </script>
 </body>
